@@ -5,6 +5,8 @@ project(range VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
+find_package(Threads REQUIRED)
+
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(range main.cpp)
@@ -14,7 +16,6 @@ set_target_properties(range PROPERTIES
     CXX_STANDARD_REQUIRED ON
     COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
-
 
 install(TARGETS range RUNTIME DESTINATION bin)
 
