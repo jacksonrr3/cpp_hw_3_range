@@ -5,7 +5,12 @@ addons:
   apt:
     packages:
 
+install:
+  - pip install conan
+  - conan user
+
 script:
+- conan install .
 - cmake .
 - cmake --build .
 
