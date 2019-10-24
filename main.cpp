@@ -1,31 +1,15 @@
-//#include <cassert>
-//#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <stdexcept>
-
-#include <fstream>
-
-//#include <range/v3/all.hpp>
-//#include <meta/meta.hpp>
-//#include <range/v3/view/view.hpp>
-//#include <range/v3/view/transform.hpp>
 #include <range/v3/view.hpp>
 #include <range/v3/algorithm.hpp>
-
 
 using ip_addr = std::vector<int>;
 using ip_pool = std::multiset<ip_addr, std::greater<>>;
 
-// ("",  '.') -> [""]
-// ("11", '.') -> ["11"]
-// ("..", '.') -> ["", "", ""]
-// ("11.", '.') -> ["11", ""]
-// (".11", '.') -> ["", "11"]
-// ("11.22", '.') -> ["11", "22"]
 std::vector<std::string> split(const std::string &str, char d)
 {
     std::vector<std::string> r;
@@ -65,58 +49,31 @@ void filter(const ip_pool& pool, Args...args)
         if (++it_start == pool.end()) { return; }
     }
     while (std::equal(it_start->begin(), it_start->begin() + sizeof...(args), temp.begin()));
-
-    /*	//предыдущий вариант реализации фильтра, с поиском итераторов на первый и последний элемент подходящие по свойствам.
-    //поиск итератора на последний элемент последовательности подходящих по условию фильтра элементов
-    auto it_finish = std::upper_bound(it_start, pool.end(), temp,
-        [](auto b, auto a) {return !((std::equal(a.begin(), a.begin() + sizeof...(args), b.begin())) || (a > b));});
-
-    //вывод отфильтрованных элементов
-    for (;it_start != it_finish; ++it_start)
-    {
-        print_ip_addr(*it_start);
-    }
-    */
 }
 
 void filter_any(const ip_pool& pool, int a)
 {
-
-    ranges::for_each(pool | ranges::view::filter([a=a](auto it) { return ranges::any_of(it,[a=a](auto v_i) {return v_i == a; }); }), [](auto i) {  print_ip_addr(i); });
- // ranges::for_each(pool | ranges::view::filter([a=a](auto it) { return std::any_of(it.begin(), it.end(), [a=a](auto vec) {return vec == a; }); }), [](auto i) {  print_ip_addr(i); });
-
-/*
-    for (auto it : pool)
-    {
-        if (std::any_of(it.begin(), it.end(), [a=a](auto vec) {return vec == a; }))
-        {
-            print_ip_addr(it);
-        }
-    }
-*/
+    ranges::for_each(pool | ranges::view::filter([a=a](auto it) { return ranges::any_of(it,[a=a](auto v_i) {return v_i == a; }); }), 
+                     [](auto i) {  print_ip_addr(i); });
 }
 
 int main()
 {
     try
     {
-        std::ifstream cin_f("/home/jacksonrr3/Downloads/ip_filter.tsv");
-
         ip_pool ip_pool;
 
-        for (std::string line; std::getline(cin_f, line);)
+        for (std::string line; std::getline(std::cin, line);)
         {
             auto v1 = (split(line, '\t'));
             auto v2 = (split(v1.at(0), '.'));
-          //  ip_pool.emplace(ip_addr{ std::stoi(v2[0]), std::stoi(v2[1]), std::stoi(v2[2]), std::stoi(v2[3])});
-          ip_pool.emplace(v2 | ranges::view::transform([](auto i){return std::stoi(i);}));
+            ip_pool.emplace(v2 | ranges::view::transform([](auto i){return std::stoi(i);}));
         }
 
         //выброс исключения и завершение программы при отсутствии входных данных
         if (ip_pool.empty()) { throw std::runtime_error("No input data!"); }
 
         // TODO reverse lexicographically sort
-       // for (auto it : ip_pool)	{print_ip_addr(it);}
         ranges::for_each(ip_pool, [](auto it){print_ip_addr(it);});
 
         // TODO filter by first byte and output
@@ -131,12 +88,6 @@ int main()
         //ip = filter_any(46);
         filter_any(ip_pool, 46);
 
-/*
-        const std::string s{"hello"};
-
-        ranges::for_each(s | ranges::view::filter([](auto c) { return c == 'l'; }),
-                         [](auto i) { std::cout << i << std::endl; });
-*/
     }
     catch (const std::exception &e)
     {
