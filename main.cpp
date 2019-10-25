@@ -74,7 +74,7 @@ int main()
             auto v2 = (split(v1.at(0), '.'));
             //выброс исключения и завершение программы при не корректных входных данных
             if (v2.size() != 4) { throw std::runtime_error("Wrong input data!"); }
-            ip_pool.emplase(ip_addr{std::stoi(v2.[0]), std::stoi(v2.[1]), std::stoi(v2.[2]), std::stoi(v2.[3])});
+            ip_pool.emplase(ip_addr{std::stoi(v2[0]), std::stoi(v2[1]), std::stoi(v2[2]), std::stoi(v2[3])});
 	//не заработал вариант с range. причина пока не ясна. 
 	//ip_pool.emplace(ranges::views::for_each(v2 | ranges::views::transform([](auto i){return std::stoi(i);})) | ranges::to<std::array>());
 			
