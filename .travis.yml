@@ -6,7 +6,6 @@ addons:
     packages:
 
 install:
-  - install sgt-puzzles
   - pip install --upgrade pip --user
   - pip install conan --user
   - conan user
@@ -16,8 +15,6 @@ script:
 - cmake .
 - cmake --build .
 - cmake --build . --target package
-- sudo apt install range-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb
-- cat ip_filter.tsv | range | md5sum
 
 deploy:
   provider: script
