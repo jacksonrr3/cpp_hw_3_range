@@ -4,10 +4,11 @@
 #include <set>
 #include <algorithm>
 #include <stdexcept>
+#include <array>
 #include <range/v3/view.hpp>
 #include <range/v3/algorithm.hpp>
 
-using ip_addr = std::vector<int>;
+using ip_addr = std::array<int, 4>;
 using ip_pool = std::multiset<ip_addr, std::greater<>>;
 
 std::vector<std::string> split(const std::string &str, char d)
@@ -36,11 +37,12 @@ void print_ip_addr(const ip_addr& ip)
 template <typename...Args>
 void filter(const ip_pool& pool, Args...args)
 {
-    ip_addr temp = { args... };
-
+    //ip_addr temp = { args... };
+    std::array<int, sizeof...(args)> temp = { args... };
     //поиск итератора на первый элемент последовательности подходящих по условию фильтра элементов
     auto it_start = std::lower_bound(pool.begin(), pool.end(), temp,
-                                     [](auto a, auto b) {return !((std::equal(a.begin(), a.begin() + sizeof...(args), b.begin())) || (a < b));});
+                                    [](auto a, auto b) {return !((std::lexicographical_compare(a.begin(), a.begin() + sizeof...(args), b.begin(), b.end())) ||
+			                                                      std::equal(a.begin(), a.begin() + sizeof...(args), b.begin()));});
     if (it_start == pool.end()) { return; }
 
     //вывод элементов пока совпадение с условием фильтра и проверка на выход на границу контейнера
@@ -67,6 +69,8 @@ int main()
         {
             auto v1 = (split(line, '\t'));
             auto v2 = (split(v1.at(0), '.'));
+            //выброс исключения и завершение программы при не корректных входных данных
+            if (v2.size() != 4) { throw std::runtime_error("Wrong input data!"); }
             ip_pool.emplace(v2 | ranges::view::transform([](auto i){return std::stoi(i);}));
         }
 
