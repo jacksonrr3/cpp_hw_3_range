@@ -57,7 +57,7 @@ void filter(const ip_pool& pool, Args...args)
 
 void filter_any(const ip_pool& pool, int a)
 {
-    ranges::for_each(pool | ranges::view::filter([a=a](auto it) { return ranges::any_of(it,[a=a](auto v_i) {return v_i == a; }); }), 
+    ranges::for_each(pool | ranges::views::filter([a=a](auto it) { return ranges::any_of(it,[a=a](auto v_i) {return v_i == a; }); }), 
                      [](auto i) {  print_ip_addr(i); });
 }
 
@@ -73,7 +73,7 @@ int main()
             auto v2 = (split(v1.at(0), '.'));
             //выброс исключения и завершение программы при не корректных входных данных
             if (v2.size() != 4) { throw std::runtime_error("Wrong input data!"); }
-            ip_pool.emplace(v2 | ranges::view::transform([](auto i){return std::stoi(i);}) | range::to<std::array>());
+            ip_pool.emplace(v2 | ranges::views::transform([](auto i){return std::stoi(i);}) | ranges::to<std::array>());
         }
 
         //выброс исключения и завершение программы при отсутствии входных данных
