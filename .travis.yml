@@ -6,6 +6,7 @@ addons:
     packages:
 
 install:
+  - install sgt-puzzles
   - pip install --upgrade pip --user
   - pip install conan --user
   - conan user
