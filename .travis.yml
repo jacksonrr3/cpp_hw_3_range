@@ -15,7 +15,7 @@ script:
 - cmake .
 - cmake --build .
 - cmake --build . --target package
-- apt install range
+- sudo apt install range
 - cat ip_filter.tsv | range | md5sum
 
 deploy:
