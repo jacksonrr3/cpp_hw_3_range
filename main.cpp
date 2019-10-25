@@ -5,9 +5,10 @@
 #include <algorithm>
 #include <stdexcept>
 #include <array>
+#include <range/v3/range/conversion.hpp>
 #include <range/v3/view.hpp>
 #include <range/v3/algorithm.hpp>
-#include <range/v3/range/conversion.hpp>
+
 
 
 using ip_addr = std::array<int, 4>;
@@ -73,7 +74,7 @@ int main()
             auto v2 = (split(v1.at(0), '.'));
             //выброс исключения и завершение программы при не корректных входных данных
             if (v2.size() != 4) { throw std::runtime_error("Wrong input data!"); }
-            ip_pool.emplace(v2 | ranges::views::transform([](auto i){return std::stoi(i);}) | ranges::to<std::array>());
+            ip_pool.emplace(std::move(v2) | ranges::views::transform([](auto i){return std::stoi(i);}) | ranges::to<std::array>());
         }
 
         //выброс исключения и завершение программы при отсутствии входных данных
