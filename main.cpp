@@ -9,8 +9,6 @@
 #include <range/v3/view.hpp>
 #include <range/v3/algorithm.hpp>
 
-
-
 using ip_addr = std::array<int, 4>;
 using ip_pool = std::multiset<ip_addr, std::greater<>>;
 
@@ -23,42 +21,29 @@ std::vector<std::string> split(const std::string &str, char d)
     while (stop != std::string::npos)
     {
         r.push_back(str.substr(start, stop - start));
-
         start = stop + 1;
         stop = str.find_first_of(d, start);
     }
-
     r.push_back(str.substr(start));
     return r;
 }
 
 void print_ip_addr(const ip_addr& ip)
 {
-    std::cout << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << std::endl;
+	std::cout << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << std::endl;
 }
 
-template <typename...Args>
-void filter(const ip_pool& pool, Args...args)
+template <typename ...Args>
+void filter(const ip_pool& pool, Args...args) 
 {
-    //ip_addr temp = { args... };
-    std::array<int, sizeof...(args)> temp = { args... };
-    //поиск итератора на первый элемент последовательности подходящих по условию фильтра элементов
-    auto it_start = std::lower_bound(pool.begin(), pool.end(), temp,
-                                    [](auto a, auto b) {return !((std::lexicographical_compare(a.begin(), a.begin() + sizeof...(args), b.begin(), b.end())) ||
-			                                                      std::equal(a.begin(), a.begin() + sizeof...(args), b.begin()));});
-    if (it_start == pool.end()) { return; }
-
-    //вывод элементов пока совпадение с условием фильтра и проверка на выход на границу контейнера
-    do {
-        print_ip_addr(*it_start);
-        if (++it_start == pool.end()) { return; }
-    }
-    while (std::equal(it_start->begin(), it_start->begin() + sizeof...(args), temp.begin()));
+	std::array<int, sizeof...(args)> temp = { args... };
+	ranges::for_each(pool | ranges::views::filter([&temp](auto it) { return ranges::equal(it.begin(), it.begin() + sizeof...(args), temp.begin());}),
+		[](auto i) {  print_ip_addr(i); });
 }
 
 void filter_any(const ip_pool& pool, int a)
 {
-    ranges::for_each(pool | ranges::views::filter([a=a](auto it) { return ranges::any_of(it,[a=a](auto v_i) {return v_i == a; }); }), 
+	ranges::for_each(pool | ranges::views::filter([a=a](auto it) { return ranges::any_of(it,[a=a](auto v_i) {return v_i == a; }); }), 
                      [](auto i) {  print_ip_addr(i); });
 }
 
@@ -75,7 +60,7 @@ int main()
             //выброс исключения и завершение программы при не корректных входных данных
             if (v2.size() != 4) { throw std::runtime_error("Wrong input data!"); }
             ip_pool.emplace(ip_addr{ std::stoi(v2[0]), std::stoi(v2[1]), std::stoi(v2[2]), std::stoi(v2[3])});
-	//не заработал вариант с range. причина пока не ясна. 
+	//не заработал вариант с range. похоже, что моя ошибка в том, что я пытаюсь изменить тип функцией трансформ, а не значение 
 	//ip_pool.emplace(ranges::views::for_each(v2 | ranges::views::transform([](auto i){return std::stoi(i);})) | ranges::to<std::array>());
 			
         }
