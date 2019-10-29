@@ -37,7 +37,7 @@ template <typename ...Args>
 void filter(const ip_pool& pool, Args...args) 
 {
 	std::array<int, sizeof...(args)> temp = { args... };
-	ranges::for_each(pool | ranges::views::filter([&temp](auto it) { return ranges::equal(it.begin(), it.begin() + sizeof...(args), temp.begin());}),
+	ranges::for_each(pool | ranges::views::filter([&temp](auto it) { return std::equal(it.begin(), it.begin() + sizeof...(args), temp.begin());}),
 		[](auto i) {  print_ip_addr(i); });
 }
 
